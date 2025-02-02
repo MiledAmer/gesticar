@@ -59,5 +59,10 @@
   "ct3aMetadata": {
     "initVersion": "7.38.1"
   },
-  "packageManager": "npm@10.9.2"
+  "packageManager": "npm@10.9.2",
+  "lint-staged": {
+    "*.{ts,tsx,js,jsx}": [
+      "npm run lint"
+    ]
+  }
 }
