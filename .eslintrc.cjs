@@ -35,12 +35,10 @@ const config = {
         },
       },
     ],
-    "no-console": [
-      "error",
-      {
-        allow: ["warn", "error"],
-      },
-    ],
+    "no-console": ["error", { allow: ["warn", "error"] }],
+    "id-denylist": ["error"],
+    "@typescript-eslint/no-explicit-any": "error",
   },
+  ignorePatterns: ["src/components/ui/**"],
 };
 module.exports = config;
