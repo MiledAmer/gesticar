@@ -1,1 +1,26 @@
+# Disable exit on error so we can capture lint-staged's exit code.
+set +e
+
 npx lint-staged
+status=$?
+
+HOOK_DIR="$(dirname "$0")"
+
+RANDOM_NUM=$(( (RANDOM % 3) + 1 ))
+
+if [ $status -eq 0 ]; then
+  echo "✅ Commit succeeded!"
+  SOUND_PATH="$HOOK_DIR/success/$RANDOM_NUM.wav"
+else
+  echo "❌ Commit failed!"
+  SOUND_PATH="$HOOK_DIR/failure/$RANDOM_NUM.wav"
+fi
+
+# Convert the Unix-style path to a Windows path.
+WINDOWS_SOUND_PATH=$(cygpath -w "$SOUND_PATH")
+
+powershell.exe -Command "(New-Object Media.SoundPlayer '$WINDOWS_SOUND_PATH').PlaySync();" || echo "⚠ Sound command failed"
+
+if [ $status -ne 0 ]; then
+  exit 1
+fi

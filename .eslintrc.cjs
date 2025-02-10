@@ -39,10 +39,6 @@ const config = {
     "id-denylist": ["error"],
     "@typescript-eslint/no-explicit-any": "error",
   },
-  ignorePatterns: [
-    "/src/components/ui/**",
-    "/src/server/api/trpc.ts",
-    "/src/hooks/use-toast.ts",
-  ],
+  ignorePatterns: ["src/components/ui/**"],
 };
 module.exports = config;
