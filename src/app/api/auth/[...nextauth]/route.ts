@@ -1,3 +1,7 @@
-import { handlers } from "~/server/auth";
+import { authOptions } from "~/server/auth";
+import NextAuth from "next-auth";
+import { type NextApiHandler } from "next";
 
-export const { GET, POST } = handlers;
+const handler: NextApiHandler = NextAuth(authOptions) as NextApiHandler;
+
+export { handler as GET, handler as POST };
