@@ -15,7 +15,7 @@ import {
 } from "~/components/ui/dropdown-menu";
 import { Button } from "~/components/ui/button";
 import { MoreHorizontal, Pencil, Trash } from "lucide-react";
-import type { Agency } from "~/types/agency";
+import { Agency } from "@prisma/client";
 
 interface AgenciesTableProps {
   agencies: Agency[];
@@ -39,7 +39,7 @@ export function AgenciesTable({ agencies }: AgenciesTableProps) {
           {agencies.map((agency) => (
             <TableRow key={agency.id}>
               <TableCell className="font-medium">{agency.name}</TableCell>
-              <TableCell>{agency.telephone}</TableCell>
+              <TableCell>{agency.phone}</TableCell>
               <TableCell>{agency.email}</TableCell>
               <TableCell>{agency.city}</TableCell>
               <TableCell>{agency.rne}</TableCell>

@@ -14,45 +14,58 @@ import {
   SelectTrigger,
   SelectValue,
 } from "~/components/ui/select";
-import type { UserRole } from "~/types/user";
+import { Agency, Role } from "@prisma/client";
+import { toast } from "sonner";
+import { CreateUser } from "~/actions/user";
 
 const formSchema = z.object({
-  name: z.string().min(2, "Le nom doit contenir au moins 2 caractères"),
-  telephone: z.string().min(10, "Numéro de téléphone invalide"),
+  firstname: z.string().min(2, "Le nom doit contenir au moins 2 caractères"),
+  phone: z.string().min(8, "Numéro de téléphone invalide"),
   email: z.string().email("Adresse email invalide"),
   address: z.string().min(5, "L'adresse doit contenir au moins 5 caractères"),
-  role: z.enum(["admin", "manager", "user"] as const, {
+  role: z.enum(["SUPER_ADMIN", "ADMIN", "USER"] as const, {
     required_error: "Veuillez sélectionner un rôle",
   }),
+  agency: z.string(),
 });
 
 type FormValues = z.infer<typeof formSchema>;
 
-interface UserFormProps {
-  onSubmit: (data: FormValues) => Promise<void>;
-  onCancel: () => void;
-}
-
-const roles: { label: string; value: UserRole }[] = [
-  { label: "Administrateur", value: "admin" },
-  { label: "Manager", value: "manager" },
-  { label: "Utilisateur", value: "user" },
+const roles: { label: string; value: Role }[] = [
+  { label: "Administrateur", value: "SUPER_ADMIN" },
+  { label: "Manager", value: "ADMIN" },
+  { label: "Utilisateur", value: "USER" },
 ];
 
-export default function UserForm({ onSubmit, onCancel }: UserFormProps) {
+export default function UserForm({ agencies }: { agencies: Agency[] }) {
   const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      name: "",
-      telephone: "",
+      firstname: "",
+      phone: "",
       email: "",
       address: "",
-      role: "user",
+      role: "USER",
+      agency: "",
     },
   });
 
   async function handleSubmit(data: FormValues) {
-    await onSubmit(data);
+    const respense = await CreateUser({
+      firstname: data.firstname,
+      phone: parseInt(data.phone),
+      email: data.email,
+      adress: data.address,
+      role: data.role,
+      agency: { connect: { id: data.agency } },
+      active: true,
+      deleted: false,
+    });
+    if (respense) {
+      toast.success("Agence enregistrée avec succès");
+    } else {
+      toast.error("Une erreur est survenue lors de l'enregistrement.");
+    }
     form.reset();
   }
 
@@ -60,10 +73,10 @@ export default function UserForm({ onSubmit, onCancel }: UserFormProps) {
     <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-4">
       <div className="space-y-2">
         <Label htmlFor="name">Nom</Label>
-        <Input {...form.register("name")} placeholder="Entrez le nom" />
-        {form.formState.errors.name && (
+        <Input {...form.register("firstname")} placeholder="Entrez le nom" />
+        {form.formState.errors.firstname && (
           <p className="text-sm text-destructive">
-            {form.formState.errors.name.message}
+            {form.formState.errors.firstname.message}
           </p>
         )}
       </div>
@@ -72,13 +85,13 @@ export default function UserForm({ onSubmit, onCancel }: UserFormProps) {
         <div className="space-y-2">
           <Label htmlFor="telephone">Téléphone</Label>
           <Input
-            {...form.register("telephone")}
+            {...form.register("phone")}
             type="tel"
             placeholder="Entrez le numéro de téléphone"
           />
-          {form.formState.errors.telephone && (
+          {form.formState.errors.phone && (
             <p className="text-sm text-destructive">
-              {form.formState.errors.telephone.message}
+              {form.formState.errors.phone.message}
             </p>
           )}
         </div>
@@ -110,7 +123,7 @@ export default function UserForm({ onSubmit, onCancel }: UserFormProps) {
       <div className="space-y-2">
         <Label htmlFor="role">Rôle</Label>
         <Select
-          onValueChange={(value: UserRole) => form.setValue("role", value)}
+          onValueChange={(value: Role) => form.setValue("role", value)}
           defaultValue={form.getValues("role")}
         >
           <SelectTrigger>
@@ -131,8 +144,32 @@ export default function UserForm({ onSubmit, onCancel }: UserFormProps) {
         )}
       </div>
 
+      <div className="space-y-2">
+        <Label htmlFor="agency">Agence</Label>
+        <Select
+          onValueChange={(value: Role) => form.setValue("agency", value)}
+          defaultValue={form.getValues("agency")}
+        >
+          <SelectTrigger>
+            <SelectValue placeholder="Sélectionnez une agence" />
+          </SelectTrigger>
+          <SelectContent>
+            {agencies.map((agency) => (
+              <SelectItem key={agency.id} value={agency.id}>
+                {agency.name}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+        {form.formState.errors.role && (
+          <p className="text-sm text-destructive">
+            {form.formState.errors.role.message}
+          </p>
+        )}
+      </div>
+
       <DialogFooter>
-        <Button variant="outline" type="button" onClick={onCancel}>
+        <Button variant="outline" type="button">
           Annuler
         </Button>
         <Button type="submit" disabled={form.formState.isSubmitting}>
