@@ -39,6 +39,10 @@ const config = {
     "id-denylist": ["error"],
     "@typescript-eslint/no-explicit-any": "error",
   },
-  ignorePatterns: ["src/components/ui/**"],
+  ignorePatterns: [
+    "src/components/ui/**",
+    "src/app/api/auth/[...nextauth]/route",
+    ".next",
+  ],
 };
 module.exports = config;
