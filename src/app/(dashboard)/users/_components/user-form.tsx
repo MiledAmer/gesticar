@@ -14,7 +14,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "~/components/ui/select";
-import { Agency, Role } from "@prisma/client";
+import type { Agency, Role } from "@prisma/client";
 import { toast } from "sonner";
 import { CreateUser } from "~/actions/user";
 

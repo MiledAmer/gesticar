@@ -45,6 +45,10 @@ const providers = CredentialsProvider({
       throw new Error("No user found");
     }
 
+    if (user.deleted) {
+      throw new Error("user is deleted");
+    }
+
     const match = await compare(credentials.password, user.password ?? "");
     if (!match) {
       throw new Error("Invalid credentials.");
